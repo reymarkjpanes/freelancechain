@@ -8,6 +8,7 @@ import {
   nativeToScVal,
   Address,
   rpc,
+  xdr,
 } from "@stellar/stellar-sdk";
 
 const RPC_URL = process.env.STELLAR_RPC_URL!;
@@ -27,7 +28,6 @@ export async function POST(req: NextRequest) {
     const server = new rpc.Server(RPC_URL, { allowHttp: false });
     const opsKeypair = Keypair.fromSecret(OPS_SECRET);
     const opsAccount = await server.getAccount(opsKeypair.publicKey());
-
     const contract = new Contract(CONTRACT_ADDRESS);
 
     const tx = new TransactionBuilder(opsAccount, {
@@ -47,11 +47,21 @@ export async function POST(req: NextRequest) {
       .setTimeout(30)
       .build();
 
-    // Prepare (simulate) the transaction
-    const prepared = await server.prepareTransaction(tx);
-    prepared.sign(opsKeypair);
+    // Simulate first
+    const simResult = await server.simulateTransaction(tx);
 
-    const result = await server.sendTransaction(prepared);
+    if (rpc.Api.isSimulationError(simResult)) {
+      return NextResponse.json(
+        { error: simResult.error },
+        { status: 400 }
+      );
+    }
+
+    // Assemble (attach footprint + resource fees) using v13 pattern
+    const assembled = rpc.assembleTransaction(tx, simResult).build();
+    assembled.sign(opsKeypair);
+
+    const result = await server.sendTransaction(assembled);
 
     if (result.status === "ERROR") {
       return NextResponse.json(
@@ -61,25 +71,19 @@ export async function POST(req: NextRequest) {
     }
 
     // Poll for confirmation
-    let hash = result.hash;
-    let confirmed = false;
+    const hash = result.hash;
     for (let i = 0; i < 20; i++) {
       await new Promise((r) => setTimeout(r, 2000));
       const status = await server.getTransaction(hash);
       if (status.status === rpc.Api.GetTransactionStatus.SUCCESS) {
-        confirmed = true;
-        break;
+        return NextResponse.json({ job_id, tx_hash: hash });
       }
       if (status.status === rpc.Api.GetTransactionStatus.FAILED) {
         return NextResponse.json({ error: "Transaction failed on-chain" }, { status: 500 });
       }
     }
 
-    if (!confirmed) {
-      return NextResponse.json({ error: "Transaction timed out" }, { status: 504 });
-    }
-
-    return NextResponse.json({ job_id, tx_hash: hash });
+    return NextResponse.json({ error: "Transaction timed out" }, { status: 504 });
   } catch (err: any) {
     console.error("[create-job]", err);
     return NextResponse.json(
