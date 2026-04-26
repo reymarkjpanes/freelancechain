@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
-  Keypair,
   Networks,
   TransactionBuilder,
   BASE_FEE,
@@ -12,7 +11,6 @@ import {
 
 const RPC_URL = process.env.STELLAR_RPC_URL!;
 const CONTRACT_ADDRESS = process.env.ESCROW_CONTRACT_ADDRESS!;
-const OPS_SECRET = process.env.OPS_ACCOUNT_SECRET_KEY!;
 
 type Action = "fund_job" | "submit_milestone" | "approve_milestone";
 
@@ -35,12 +33,12 @@ export async function GET(req: NextRequest) {
 
   try {
     const server = new rpc.Server(RPC_URL, { allowHttp: false });
-    const opsKeypair = Keypair.fromSecret(OPS_SECRET);
-    // Use caller's account for sequence — Soroban fee bump isn't needed here;
-    // we build the tx with the ops account as the source (fee payer) but the
-    // caller's require_auth() is satisfied by the wallet signature below.
-    // For simplicity in the demo we use ops source + caller auth.
-    const opsAccount = await server.getAccount(opsKeypair.publicKey());
+
+    // Use the CALLER's account as the transaction source.
+    // This way, when Freighter signs the transaction envelope, the signature
+    // automatically satisfies all require_auth() calls for the caller address
+    // (Soroban's "source account auth" path).
+    const callerAccount = await server.getAccount(caller_address);
     const contract = new Contract(CONTRACT_ADDRESS);
 
     let operation;
@@ -69,7 +67,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const tx = new TransactionBuilder(opsAccount, {
+    const tx = new TransactionBuilder(callerAccount, {
       fee: BASE_FEE,
       networkPassphrase: Networks.TESTNET,
     })
@@ -97,3 +95,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+

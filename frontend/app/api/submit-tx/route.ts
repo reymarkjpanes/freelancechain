@@ -1,11 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  TransactionBuilder,
-  Networks,
-  rpc,
-} from "@stellar/stellar-sdk";
 
 const RPC_URL = process.env.STELLAR_RPC_URL!;
+
+/**
+ * Raw JSON-RPC helper — bypasses the SDK's XDR parser which crashes
+ * on Protocol 22 transaction results ("Bad union switch: 4").
+ */
+async function rpcCall(method: string, params: Record<string, unknown>) {
+  const res = await fetch(RPC_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
+  });
+  const json = await res.json();
+  if (json.error) {
+    throw new Error(json.error.message ?? JSON.stringify(json.error));
+  }
+  return json.result;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,34 +27,41 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing signed_xdr" }, { status: 400 });
     }
 
-    const server = new rpc.Server(RPC_URL, { allowHttp: false });
+    // Submit using raw JSON-RPC to avoid SDK XDR parsing issues
+    const sendResult = await rpcCall("sendTransaction", {
+      transaction: signed_xdr,
+    });
 
-    // Reconstruct transaction from XDR
-    const tx = TransactionBuilder.fromXDR(signed_xdr, Networks.TESTNET);
+    console.log("[submit-tx] sendTransaction result:", JSON.stringify(sendResult));
 
-    const result = await server.sendTransaction(tx);
-
-    if (result.status === "ERROR") {
-      return NextResponse.json(
-        { error: result.errorResult?.toString() ?? "Transaction error" },
-        { status: 500 }
-      );
+    if (sendResult.status === "ERROR") {
+      const diagEvents = sendResult.diagnosticEventsXdr ?? [];
+      const errorDetail = diagEvents.length > 0
+        ? diagEvents.join(". ")
+        : sendResult.errorResultXdr ?? "Transaction error";
+      return NextResponse.json({ error: errorDetail }, { status: 500 });
     }
 
-    const hash = result.hash;
+    const hash = sendResult.hash;
 
     // Poll until confirmed
     for (let i = 0; i < 20; i++) {
       await new Promise((r) => setTimeout(r, 2000));
-      const status = await server.getTransaction(hash);
 
-      if (status.status === rpc.Api.GetTransactionStatus.SUCCESS) {
+      const txResult = await rpcCall("getTransaction", { hash });
+
+      if (txResult.status === "SUCCESS") {
         return NextResponse.json({ tx_hash: hash });
       }
 
-      if (status.status === rpc.Api.GetTransactionStatus.FAILED) {
+      if (txResult.status === "FAILED") {
+        // Try to extract diagnostic info
+        const diagEvents = txResult.diagnosticEventsXdr ?? [];
+        const errorDetail = diagEvents.length > 0
+          ? diagEvents.join(". ")
+          : "Transaction failed on-chain";
         return NextResponse.json(
-          { error: "Transaction failed on-chain" },
+          { error: errorDetail },
           { status: 500 }
         );
       }
@@ -58,3 +77,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

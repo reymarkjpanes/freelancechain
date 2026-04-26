@@ -8,13 +8,31 @@ import {
   nativeToScVal,
   Address,
   rpc,
-  xdr,
 } from "@stellar/stellar-sdk";
 
 const RPC_URL = process.env.STELLAR_RPC_URL!;
 const CONTRACT_ADDRESS = process.env.ESCROW_CONTRACT_ADDRESS!;
 const OPS_SECRET = process.env.OPS_ACCOUNT_SECRET_KEY!;
 const TOKEN_ADDRESS = process.env.XLM_TOKEN_ADDRESS!;
+
+/**
+ * Raw JSON-RPC call to getTransaction — bypasses the SDK's XDR parser
+ * which crashes on Protocol 22 transaction results ("Bad union switch: 4").
+ */
+async function rawGetTransaction(hash: string): Promise<{ status: string }> {
+  const res = await fetch(RPC_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "getTransaction",
+      params: { hash },
+    }),
+  });
+  const json = await res.json();
+  return json.result ?? { status: "NOT_FOUND" };
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -70,17 +88,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Poll for confirmation
+    // Poll for confirmation using raw JSON-RPC to avoid SDK XDR parsing bug
     const hash = result.hash;
     for (let i = 0; i < 20; i++) {
       await new Promise((r) => setTimeout(r, 2000));
-      const status = await server.getTransaction(hash);
-      if (status.status === rpc.Api.GetTransactionStatus.SUCCESS) {
+      const txResult = await rawGetTransaction(hash);
+      if (txResult.status === "SUCCESS") {
         return NextResponse.json({ job_id, tx_hash: hash });
       }
-      if (status.status === rpc.Api.GetTransactionStatus.FAILED) {
+      if (txResult.status === "FAILED") {
         return NextResponse.json({ error: "Transaction failed on-chain" }, { status: 500 });
       }
+      // NOT_FOUND = still pending, keep polling
     }
 
     return NextResponse.json({ error: "Transaction timed out" }, { status: 504 });
