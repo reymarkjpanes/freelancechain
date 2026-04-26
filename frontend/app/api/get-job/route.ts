@@ -6,7 +6,7 @@ import {
   BASE_FEE,
   Contract,
   nativeToScVal,
-  SorobanRpc,
+  rpc,
   scValToNative,
 } from "@stellar/stellar-sdk";
 
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const server = new SorobanRpc.Server(RPC_URL, { allowHttp: false });
+    const server = new rpc.Server(RPC_URL, { allowHttp: false });
     const opsKeypair = Keypair.fromSecret(OPS_SECRET);
     const opsAccount = await server.getAccount(opsKeypair.publicKey());
     const contract = new Contract(CONTRACT_ADDRESS);
@@ -40,12 +40,12 @@ export async function GET(req: NextRequest) {
 
     const simulated = await server.simulateTransaction(tx);
 
-    if (SorobanRpc.Api.isSimulationError(simulated)) {
+    if (rpc.Api.isSimulationError(simulated)) {
       return NextResponse.json({ error: simulated.error }, { status: 400 });
     }
 
     if (
-      !SorobanRpc.Api.isSimulationSuccess(simulated) ||
+      !rpc.Api.isSimulationSuccess(simulated) ||
       !simulated.result
     ) {
       return NextResponse.json({ error: "No result from simulation" }, { status: 500 });

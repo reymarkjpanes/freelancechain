@@ -7,7 +7,7 @@ import {
   Contract,
   nativeToScVal,
   Address,
-  SorobanRpc,
+  rpc,
 } from "@stellar/stellar-sdk";
 
 const RPC_URL = process.env.STELLAR_RPC_URL!;
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const server = new SorobanRpc.Server(RPC_URL, { allowHttp: false });
+    const server = new rpc.Server(RPC_URL, { allowHttp: false });
     const opsKeypair = Keypair.fromSecret(OPS_SECRET);
     // Use caller's account for sequence — Soroban fee bump isn't needed here;
     // we build the tx with the ops account as the source (fee payer) but the
@@ -79,14 +79,14 @@ export async function GET(req: NextRequest) {
 
     // Simulate to get the footprint / resource data
     const simulated = await server.simulateTransaction(tx);
-    if (SorobanRpc.Api.isSimulationError(simulated)) {
+    if (rpc.Api.isSimulationError(simulated)) {
       return NextResponse.json(
         { error: simulated.error },
         { status: 400 }
       );
     }
 
-    const prepared = SorobanRpc.assembleTransaction(tx, simulated).build();
+    const prepared = rpc.assembleTransaction(tx, simulated).build();
 
     return NextResponse.json({ xdr: prepared.toXDR() });
   } catch (err: any) {

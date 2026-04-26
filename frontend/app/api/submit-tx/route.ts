@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   TransactionBuilder,
   Networks,
-  SorobanRpc,
+  rpc,
 } from "@stellar/stellar-sdk";
 
 const RPC_URL = process.env.STELLAR_RPC_URL!;
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing signed_xdr" }, { status: 400 });
     }
 
-    const server = new SorobanRpc.Server(RPC_URL, { allowHttp: false });
+    const server = new rpc.Server(RPC_URL, { allowHttp: false });
 
     // Reconstruct transaction from XDR
     const tx = TransactionBuilder.fromXDR(signed_xdr, Networks.TESTNET);
@@ -36,11 +36,11 @@ export async function POST(req: NextRequest) {
       await new Promise((r) => setTimeout(r, 2000));
       const status = await server.getTransaction(hash);
 
-      if (status.status === SorobanRpc.Api.GetTransactionStatus.SUCCESS) {
+      if (status.status === rpc.Api.GetTransactionStatus.SUCCESS) {
         return NextResponse.json({ tx_hash: hash });
       }
 
-      if (status.status === SorobanRpc.Api.GetTransactionStatus.FAILED) {
+      if (status.status === rpc.Api.GetTransactionStatus.FAILED) {
         return NextResponse.json(
           { error: "Transaction failed on-chain" },
           { status: 500 }

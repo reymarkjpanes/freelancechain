@@ -7,8 +7,7 @@ import {
   Contract,
   nativeToScVal,
   Address,
-  xdr,
-  SorobanRpc,
+  rpc,
 } from "@stellar/stellar-sdk";
 
 const RPC_URL = process.env.STELLAR_RPC_URL!;
@@ -25,7 +24,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const server = new SorobanRpc.Server(RPC_URL, { allowHttp: false });
+    const server = new rpc.Server(RPC_URL, { allowHttp: false });
     const opsKeypair = Keypair.fromSecret(OPS_SECRET);
     const opsAccount = await server.getAccount(opsKeypair.publicKey());
 
@@ -67,11 +66,11 @@ export async function POST(req: NextRequest) {
     for (let i = 0; i < 20; i++) {
       await new Promise((r) => setTimeout(r, 2000));
       const status = await server.getTransaction(hash);
-      if (status.status === SorobanRpc.Api.GetTransactionStatus.SUCCESS) {
+      if (status.status === rpc.Api.GetTransactionStatus.SUCCESS) {
         confirmed = true;
         break;
       }
-      if (status.status === SorobanRpc.Api.GetTransactionStatus.FAILED) {
+      if (status.status === rpc.Api.GetTransactionStatus.FAILED) {
         return NextResponse.json({ error: "Transaction failed on-chain" }, { status: 500 });
       }
     }
