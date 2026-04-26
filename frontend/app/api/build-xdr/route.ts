@@ -72,7 +72,7 @@ export async function GET(req: NextRequest) {
       networkPassphrase: Networks.TESTNET,
     })
       .addOperation(operation)
-      .setTimeout(30)
+      .setTimeout(300)
       .build();
 
     // Simulate to get the footprint / resource data

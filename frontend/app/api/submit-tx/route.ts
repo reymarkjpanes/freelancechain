@@ -19,6 +19,40 @@ async function rpcCall(method: string, params: Record<string, unknown>) {
   return json.result;
 }
 
+/**
+ * Decode the errorResultXdr from sendTransaction into a human-readable message.
+ * The XDR encodes a TransactionResult with a result code as a signed 32-bit int.
+ */
+function decodeErrorResultXdr(base64Xdr: string): string {
+  try {
+    const buffer = Buffer.from(base64Xdr, "base64");
+    // TransactionResult: feeCharged (int64, 8 bytes) + result code (int32, 4 bytes)
+    if (buffer.length >= 12) {
+      const resultCode = buffer.readInt32BE(8);
+      const messages = new Map<number, string>([
+        [0,   "Transaction succeeded (unexpected in error path)"],
+        [-1,  "Transaction failed — one or more operations failed"],
+        [-2,  "Transaction submitted too early (before valid time range)"],
+        [-3,  "Transaction expired — it took too long to sign. Please try again"],
+        [-4,  "Missing operation in transaction"],
+        [-5,  "Bad sequence number — please refresh the page and try again"],
+        [-6,  "Bad authorization — signature doesn't match the required signer"],
+        [-7,  "Insufficient balance — not enough XLM in your account"],
+        [-8,  "Source account not found — make sure your account is funded"],
+        [-9,  "Insufficient fee"],
+        [-10, "Extra signatures not allowed"],
+        [-11, "Internal Stellar error"],
+        [-12, "Transaction type not supported"],
+        [-13, "Invalid Soroban data"],
+      ]);
+      return messages.get(resultCode) ?? `Unknown transaction error (code ${resultCode})`;
+    }
+  } catch {
+    // Fall through to raw XDR
+  }
+  return `Transaction error: ${base64Xdr}`;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { signed_xdr } = await req.json();
@@ -35,10 +69,10 @@ export async function POST(req: NextRequest) {
     console.log("[submit-tx] sendTransaction result:", JSON.stringify(sendResult));
 
     if (sendResult.status === "ERROR") {
-      const diagEvents = sendResult.diagnosticEventsXdr ?? [];
-      const errorDetail = diagEvents.length > 0
-        ? diagEvents.join(". ")
-        : sendResult.errorResultXdr ?? "Transaction error";
+      const errorDetail = sendResult.errorResultXdr
+        ? decodeErrorResultXdr(sendResult.errorResultXdr)
+        : "Transaction error";
+      console.error("[submit-tx] ERROR:", errorDetail);
       return NextResponse.json({ error: errorDetail }, { status: 500 });
     }
 
@@ -55,10 +89,8 @@ export async function POST(req: NextRequest) {
       }
 
       if (txResult.status === "FAILED") {
-        // Try to extract diagnostic info
-        const diagEvents = txResult.diagnosticEventsXdr ?? [];
-        const errorDetail = diagEvents.length > 0
-          ? diagEvents.join(". ")
+        const errorDetail = txResult.resultXdr
+          ? decodeErrorResultXdr(txResult.resultXdr)
           : "Transaction failed on-chain";
         return NextResponse.json(
           { error: errorDetail },

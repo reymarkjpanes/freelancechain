@@ -53,6 +53,10 @@ export async function GET(req: NextRequest) {
 
     const raw = scValToNative(simulated.result.retval);
 
+    // Debug: log the raw status to understand its type
+    console.log("[get-job] raw.status:", typeof raw.status, raw.status);
+    console.log("[get-job] raw.milestone?.status:", typeof raw.milestone?.status, raw.milestone?.status);
+
     // Map the contract's enum/struct return to a plain JSON shape
     const job = {
       job_id: raw.job_id,
@@ -77,7 +81,30 @@ export async function GET(req: NextRequest) {
   }
 }
 
+const JOB_STATUS_MAP: Record<number, string> = {
+  0: "Open",
+  1: "Funded",
+  2: "InProgress",
+  3: "Completed",
+  4: "Cancelled",
+};
+
+const MILESTONE_STATUS_MAP: Record<number, string> = {
+  0: "Pending",
+  1: "Submitted",
+  2: "Approved",
+};
+
 function mapJobStatus(raw: any): string {
+  // Array format from scValToNative: ['Funded']
+  if (Array.isArray(raw) && raw.length > 0) {
+    return String(raw[0]);
+  }
+  // Numeric variant index
+  if (typeof raw === "number") {
+    return JOB_STATUS_MAP[raw] ?? "Unknown";
+  }
+  // Object format: { Open: undefined }
   if (raw && typeof raw === "object") {
     const key = Object.keys(raw)[0];
     return key ?? "Unknown";
@@ -86,9 +113,19 @@ function mapJobStatus(raw: any): string {
 }
 
 function mapMilestoneStatus(raw: any): string {
+  // Array format from scValToNative: ['Pending']
+  if (Array.isArray(raw) && raw.length > 0) {
+    return String(raw[0]);
+  }
+  // Numeric variant index
+  if (typeof raw === "number") {
+    return MILESTONE_STATUS_MAP[raw] ?? "Unknown";
+  }
+  // Object format: { Pending: undefined }
   if (raw && typeof raw === "object") {
     const key = Object.keys(raw)[0];
     return key ?? "Unknown";
   }
   return String(raw ?? "Unknown");
 }
+

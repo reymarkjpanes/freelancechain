@@ -14,16 +14,44 @@ export default function Home() {
 
   const [job, setJob] = useState<{
     jobId: string;
+    client: string;
     freelancer: string;
     amountStroops: bigint;
   } | null>(null);
+
+  // --- Load existing job by ID ---
+  const [loadJobId, setLoadJobId] = useState("");
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadLoading, setLoadLoading] = useState(false);
 
   const handleJobCreated = (
     jobId: string,
     freelancer: string,
     amountStroops: bigint
   ) => {
-    setJob({ jobId, freelancer, amountStroops });
+    setJob({ jobId, client: wallet.publicKey!, freelancer, amountStroops });
+  };
+
+  const handleLoadJob = async () => {
+    if (!loadJobId.trim()) return;
+    setLoadError(null);
+    setLoadLoading(true);
+    try {
+      const res = await fetch(`/api/get-job?job_id=${encodeURIComponent(loadJobId.trim())}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Job not found");
+
+      setJob({
+        jobId: loadJobId.trim(),
+        client: data.client,
+        freelancer: data.freelancer,
+        amountStroops: BigInt(data.total_amount),
+      });
+    } catch (err: any) {
+      setLoadError(err.message ?? "Failed to load job");
+    } finally {
+      setLoadLoading(false);
+    }
   };
 
   return (
@@ -98,22 +126,80 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Step 2 — Create Job */}
-        <JobForm
-          walletPublicKey={wallet.publicKey}
-          onJobCreated={handleJobCreated}
-        />
+        {/* Step 2 — Create Job OR Load Existing Job */}
+        {!job && (
+          <>
+            <JobForm
+              walletPublicKey={wallet.publicKey}
+              onJobCreated={handleJobCreated}
+            />
 
-        {/* Step 3 — Escrow Flow (shown after job created) */}
+            {/* Load Existing Job */}
+            <div className="step-card">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-sm font-bold shrink-0">
+                  ↩
+                </div>
+                <div>
+                  <h2 className="text-base font-semibold text-slate-900">Load Existing Job</h2>
+                  <p className="text-sm text-slate-500">
+                    Enter a Job ID to resume an existing escrow flow.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="e.g. job_1777222048075"
+                  value={loadJobId}
+                  onChange={(e) => setLoadJobId(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleLoadJob()}
+                  className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300 bg-white"
+                  disabled={!wallet.publicKey}
+                />
+                <button
+                  onClick={handleLoadJob}
+                  disabled={!wallet.publicKey || !loadJobId.trim() || loadLoading}
+                  className="btn-primary shrink-0"
+                >
+                  {loadLoading ? "Loading…" : "Load Job"}
+                </button>
+              </div>
+
+              {loadError && (
+                <p className="text-xs text-red-500 mt-2">{loadError}</p>
+              )}
+
+              {!wallet.publicKey && (
+                <p className="text-xs text-slate-400 mt-2">Connect your wallet first.</p>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Step 3 — Escrow Flow (shown after job created or loaded) */}
         {job && wallet.publicKey && (
-          <EscrowFlow
-            jobId={job.jobId}
-            clientAddress={wallet.publicKey}
-            freelancerAddress={job.freelancer}
-            amountStroops={job.amountStroops}
-            walletPublicKey={wallet.publicKey}
-            walletKit={wallet.kit}
-          />
+          <>
+            <EscrowFlow
+              jobId={job.jobId}
+              clientAddress={job.client}
+              freelancerAddress={job.freelancer}
+              amountStroops={job.amountStroops}
+              walletPublicKey={wallet.publicKey}
+              walletKit={wallet.kit}
+            />
+
+            {/* Button to go back and create/load another job */}
+            <div className="text-center">
+              <button
+                onClick={() => setJob(null)}
+                className="text-xs text-slate-400 hover:text-violet-600 underline transition-colors"
+              >
+                ← Back to Create / Load Job
+              </button>
+            </div>
+          </>
         )}
 
         {/* Footer */}
@@ -136,3 +222,4 @@ export default function Home() {
     </div>
   );
 }
+
