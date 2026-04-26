@@ -4,10 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import {
   StellarWalletsKit,
   WalletNetwork,
-  WalletType,
   FREIGHTER_ID,
   FreighterModule,
-} from "@creit-tech/stellar-wallets-kit";
+} from "@creit.tech/stellar-wallets-kit";
 
 export interface WalletState {
   publicKey: string | null;

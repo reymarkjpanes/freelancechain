@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import TxStatus, { TxState } from "./TxStatus";
-import type { StellarWalletsKit } from "@creit-tech/stellar-wallets-kit";
+import type { StellarWalletsKit } from "@creit.tech/stellar-wallets-kit";
 
 interface JobState {
   status: "Open" | "Funded" | "InProgress" | "Completed" | "Cancelled";
