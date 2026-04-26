@@ -184,7 +184,36 @@ Open ──────→ Funded ──────→ InProgress ────�
 
 ---
 
-## Setup
+## Quick Start (Reviewers)
+
+> **The contract is already deployed on testnet.** You do NOT need Rust or Stellar CLI to run the frontend. Just clone, configure, and run.
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/reymarkjpanes/freelancechain.git
+cd freelancechain
+
+# 2. Configure environment
+cd frontend
+cp .env.local.example .env.local
+# The .env.local.example is pre-filled with the deployed contract ID
+# and testnet ops account — ready to use out of the box.
+
+# 3. Install and run
+npm install --force
+npm run dev
+# → http://localhost:3000
+```
+
+**Requirements:** Node.js 20+ and the [Freighter wallet](https://www.freighter.app/) browser extension set to **Testnet**.
+
+> **Note:** `npm install --force` is needed because `@creit.tech/stellar-wallets-kit` has a peer dependency on React 18, but this project uses React 19. The `--force` flag bypasses this — everything works correctly.
+
+---
+
+## Setup (Full Deploy from Scratch)
+
+> Only follow these steps if you want to deploy your own instance of the smart contract. If you just want to run the frontend against the existing deployed contract, use the [Quick Start](#quick-start-reviewers) above.
 
 ### 1. Smart Contract — Build & Test
 
@@ -236,7 +265,7 @@ cd frontend
 cp .env.local.example .env.local
 ```
 
-Edit `.env.local` and fill in:
+Edit `.env.local` and fill in your own values:
 
 ```env
 STELLAR_NETWORK=testnet
