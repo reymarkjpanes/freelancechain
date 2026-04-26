@@ -200,10 +200,15 @@ stellar contract invoke \
 
 ## Summary
 
-| Old Contract (prototype) | New Contract (rewrite) |
+| Old Contract (prototype) | New Contract (deployed) |
 |--------------------------|------------------------|
-| `CBPXD4WLBHOQAX3YRI3Y55LE57ERDT57SLSBP32VFEQNL66PN7MAT26X` | Your new ID from Step 3 |
-| `create_job`, `approve_and_release` | Full 6-function escrow flow |
+| `CBPXD4WLBHOQAX3YRI3Y55LE57ERDT57SLSBP32VFEQNL66PN7MAT26X` | `CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD` |
+| `create_job`, `approve_and_release` | Full 9-function escrow flow |
 | Single global job | Per-job storage keyed by `job_id` |
 | No fee logic | 250 bps fee with snapshot |
 | Panics on errors | `Result<T, ContractError>` everywhere |
+
+### Deployed Contract Links
+
+- **Stellar Lab:** https://lab.stellar.org/r/testnet/contract/CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD
+- **Stellar Expert:** https://stellar.expert/explorer/testnet/contract/CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD

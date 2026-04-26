@@ -94,17 +94,24 @@ freelancechain/
 
 ## Smart Contract
 
-### Contract ID
+### Contract ID (Deployed on Stellar Testnet)
 
 ```
 CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD
 ```
 
-**Stellar Lab:** [View on Stellar Lab](https://lab.stellar.org/r/testnet/contract/CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD)
+| Explorer | Link |
+|---|---|
+| **Stellar Lab** | [View on Stellar Lab](https://lab.stellar.org/r/testnet/contract/CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD) |
+| **Stellar Expert** | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD) |
 
-**Stellar Expert:** [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD)
+#### Deployed Contract Screenshots
 
-#### Deployed Contract Screenshot
+**Stellar Expert** — contract overview with transaction history:
+
+![Deployed FreelanceChain contract on Stellar Expert](images/stellar-expert-contract.png)
+
+**Stellar Lab** — contract explorer showing contract spec and storage:
 
 ![Deployed FreelanceChain contract on Stellar Lab](images/stellar-lab-contract.png)
 
