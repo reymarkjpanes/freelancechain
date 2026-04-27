@@ -37,6 +37,14 @@ FreelanceChain locks XLM into a Soroban smart contract the moment a job is creat
 
 All confirmed transactions link to [Stellar Expert testnet explorer](https://stellar.expert/explorer/testnet).
 
+### ⚠️ Important Usage Notes
+
+- **Do not refresh the browser** during an active escrow flow. The app stores the current job session in memory — refreshing the page will clear it. If you accidentally refresh, use **Load Existing Job** with your Job ID to resume where you left off.
+- **Testing both roles (Client & Freelancer):** Since each escrow step requires a different wallet, you have two options:
+  1. **Two browsers** — Open the app in Chrome (Client wallet) and Firefox/Edge (Freelancer wallet) side by side. Both can load the same Job ID.
+  2. **Single browser** — Disconnect the current wallet, switch to the other account in Freighter, reconnect, and use **Load Existing Job** to pick up the flow from the other party's perspective.
+- **After the other party acts**, use **Load Existing Job** with the same Job ID to see the updated on-chain status (e.g., after the client funds, the freelancer loads the job to see it's now "Funded").
+
 ---
 
 ## Architecture
