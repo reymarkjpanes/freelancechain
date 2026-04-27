@@ -2,7 +2,9 @@
 
 Peer-to-peer freelance escrow payments on Stellar, built with Soroban smart contracts.
 
-**Live Deployment:** [https://frontend-nu-pearl-3s0nq0wsv5.vercel.app](https://frontend-nu-pearl-3s0nq0wsv5.vercel.app)
+> 🚀 **Live App:** [https://frontend-nu-pearl-3s0nq0wsv5.vercel.app](https://frontend-nu-pearl-3s0nq0wsv5.vercel.app)
+>
+> 📌 **GitHub About:** Add the live app link to the **About** section of this repo so it appears at the top of the GitHub page. *(Repo → ⚙️ Settings icon next to About → Website field)*
 
 ---
 
@@ -31,7 +33,7 @@ All confirmed transactions link to [Stellar Expert testnet explorer](https://ste
 ## Architecture
 
 ```
-Next.js 15 (App Router)
+Next.js 16 (App Router)
   ├─ /api/create-job       ← Ops account signs create_job (server-side)
   ├─ /api/build-xdr        ← Builds unsigned XDR for user-signed actions
   ├─ /api/submit-tx        ← Submits signed XDR to Stellar RPC
@@ -229,7 +231,7 @@ stellar keys fund ops --network testnet
 
 # Build and test
 cd contracts/freelance_escrow
-cargo test            # All 15 tests must pass
+cargo test            # All tests must pass
 stellar contract build  # Produces .wasm in target/
 ```
 
@@ -342,9 +344,9 @@ Stellar offers sub-cent transaction fees (~$0.00001), 5-second finality, and nat
 ## Built With
 
 - [Soroban SDK](https://crates.io/crates/soroban-sdk) — Smart contract development
-- [Next.js 15](https://nextjs.org/) — Frontend framework (App Router)
+- [Next.js 16](https://nextjs.org/) — Frontend framework (App Router)
 - [@stellar/stellar-sdk](https://github.com/stellar/js-stellar-sdk) — Transaction building and RPC
-- [@creit-tech/stellar-wallets-kit](https://github.com/Creit-Tech/Stellar-Wallets-Kit) — Freighter wallet integration
+- [@creit.tech/stellar-wallets-kit](https://github.com/Creit-Tech/Stellar-Wallets-Kit) — Freighter wallet integration
 - [Tailwind CSS](https://tailwindcss.com/) — Styling
 
 ---
