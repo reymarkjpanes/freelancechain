@@ -2,6 +2,8 @@
 
 Peer-to-peer freelance escrow payments on Stellar, built with Soroban smart contracts.
 
+**Live Deployment:** [https://frontend-nu-pearl-3s0nq0wsv5.vercel.app](https://frontend-nu-pearl-3s0nq0wsv5.vercel.app)
+
 ---
 
 ## Problem
