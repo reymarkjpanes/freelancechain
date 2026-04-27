@@ -3,8 +3,16 @@
 Peer-to-peer freelance escrow payments on Stellar, built with Soroban smart contracts.
 
 > 🚀 **Live App:** [https://frontend-nu-pearl-3s0nq0wsv5.vercel.app](https://frontend-nu-pearl-3s0nq0wsv5.vercel.app)
->
-> 📌 **GitHub About:** Add the live app link to the **About** section of this repo so it appears at the top of the GitHub page. *(Repo → ⚙️ Settings icon next to About → Website field)*
+
+📌 **GitHub Repo Setup:** Add the deployed site link in the **About** section of your repo. *(Click the ⚙️ gear icon next to "About" → paste the URL in the Website field → Save)*
+
+---
+
+## App Preview
+
+![FreelanceChain — Dark glassmorphism UI with escrow workflow](images/app-ui-preview.png)
+
+*Landing page showing the Connect Wallet, Create Job, and Load Existing Job sections on the Stellar Testnet.*
 
 ---
 
@@ -20,11 +28,12 @@ FreelanceChain locks XLM into a Soroban smart contract the moment a job is creat
 
 ## Demo Flow
 
-1. **Connect** Freighter wallet (Testnet)
-2. **Create Job** — Enter freelancer address + XLM amount → ops account registers job on-chain
-3. **Fund Escrow** — Client signs via Freighter → XLM locked in smart contract
-4. **Submit Work** — Freelancer signs → milestone marked as submitted
-5. **Approve & Release** — Client approves → payment auto-transfers to freelancer (minus platform fee)
+1. **Connect Wallet** — Click "Connect Wallet" → Freighter extension connects on Testnet
+2. **Create Job** — Enter freelancer's Stellar address, XLM amount, and job description → Click "+ Create Job" → Ops account registers job on-chain and returns a **Job ID**
+3. **Load Existing Job** *(alternative to step 2)* — Enter a Job ID to resume an in-progress escrow
+4. **Fund Escrow** *(Client)* — Client signs via Freighter → XLM locked in smart contract
+5. **Submit Work** *(Freelancer)* — Freelancer signs → milestone marked as submitted
+6. **Approve & Release** *(Client)* — Client approves → payment auto-releases to freelancer (minus 2.5% platform fee)
 
 All confirmed transactions link to [Stellar Expert testnet explorer](https://stellar.expert/explorer/testnet).
 
