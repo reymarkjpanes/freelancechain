@@ -4,8 +4,6 @@ Peer-to-peer freelance escrow payments on Stellar, built with Soroban smart cont
 
 > 🚀 **Live App:** [https://frontend-nu-pearl-3s0nq0wsv5.vercel.app](https://frontend-nu-pearl-3s0nq0wsv5.vercel.app)
 
-📌 **GitHub Repo Setup:** Add the deployed site link in the **About** section of your repo. *(Click the ⚙️ gear icon next to "About" → paste the URL in the Website field → Save)*
-
 ---
 
 ## App Preview
@@ -18,11 +16,11 @@ Peer-to-peer freelance escrow payments on Stellar, built with Soroban smart cont
 
 ## Problem
 
-A Filipino freelancer doing graphic design for an overseas client has no guarantee of payment after delivering work. The client either pays upfront and risks getting ghosted, or the freelancer works first and hopes the client doesn't disappear. Traditional escrow services like Escrow.com charge 3–5% fees, take days to settle, and require KYC paperwork that locks out small freelancers. PayPal disputes are slow, biased, and freeze accounts without warning. Both sides lose.
+A Filipino freelancer doing graphic design for an overseas client has no guarantee of payment after delivering work. The client either pays upfront and risks getting ghosted, or the freelancer works for free hoping they'll be paid. Neither party has leverage.
 
 ## Solution
 
-FreelanceChain locks XLM into a Soroban smart contract the moment a job is created. The freelancer submits work, the client approves — and payment releases automatically on-chain. No middleman, no trust required, no frozen accounts. Settlement happens in under 5 seconds with fees under $0.01. A 2.5% platform fee is transparently locked at job creation and cannot be changed mid-job.
+FreelanceChain locks XLM into a Soroban smart contract the moment a job is created. The freelancer submits work, the client approves — and payment releases automatically on-chain. No middleman, no delays, no trust required. Just cryptographic certainty.
 
 ---
 
@@ -39,7 +37,7 @@ All confirmed transactions link to [Stellar Expert testnet explorer](https://ste
 
 ### ⚠️ Important Usage Notes
 
-- **Do not refresh the browser** during an active escrow flow. The app stores the current job session in memory — refreshing the page will clear it. If you accidentally refresh, use **Load Existing Job** with your Job ID to resume where you left off.
+- **Do not refresh the browser** during an active escrow flow. The app stores the current job session in memory — refreshing the page will clear it. If you accidentally refresh, use **Load Existing Job** with the saved Job ID to resume exactly where you left off.
 - **Testing both roles (Client & Freelancer):** Since each escrow step requires a different wallet, you have two options:
   1. **Two browsers** — Open the app in Chrome (Client wallet) and Firefox/Edge (Freelancer wallet) side by side. Both can load the same Job ID.
   2. **Single browser** — Disconnect the current wallet, switch to the other account in Freighter, reconnect, and use **Load Existing Job** to pick up the flow from the other party's perspective.
@@ -163,8 +161,8 @@ CBPXD4WLBHOQAX3YRI3Y55LE57ERDT57SLSBP32VFEQNL66PN7MAT26X
 ```
 Open ──────→ Funded ──────→ InProgress ──────→ Completed
 (create_job)  (fund_job)   (submit_milestone)  (approve_milestone)
-                                                  ├─ Net amount → Freelancer
-                                                  └─ Platform fee → Admin
+                                                 ├─ Net amount → Freelancer
+                                                 └─ Platform fee → Admin
 ```
 
 ### Contract Properties
@@ -228,13 +226,13 @@ npm run dev
 
 **Requirements:** Node.js 20+ and the [Freighter wallet](https://www.freighter.app/) browser extension set to **Testnet**.
 
-> **Note:** `npm install --force` is needed because `@creit.tech/stellar-wallets-kit` has a peer dependency on React 18, but this project uses React 19. The `--force` flag bypasses this — everything works correctly.
+> **Note:** `npm install --force` is needed because `@creit.tech/stellar-wallets-kit` has a peer dependency on React 18, but this project uses React 19. The `--force` flag bypasses this — everything works fine.
 
 ---
 
 ## Setup (Full Deploy from Scratch)
 
-> Only follow these steps if you want to deploy your own instance of the smart contract. If you just want to run the frontend against the existing deployed contract, use the [Quick Start](#quick-start-reviewers) above.
+> Only follow these steps if you want to deploy your own instance of the smart contract. If you just want to run the frontend against the existing deployed contract, use the [Quick Start](#quick-start-reviewers) section above.
 
 ### 1. Smart Contract — Build & Test
 
@@ -348,13 +346,13 @@ stellar contract invoke \
 
 ## Target Users
 
-Freelancers and clients in the Philippines and Southeast Asia who need a trustless way to handle project payments. Whether it's a web developer in Manila working for a startup in Singapore, or a graphic designer in Cebu freelancing for a US-based agency — FreelanceChain eliminates the need to trust a middleman. Funds are locked on-chain, released only on approval, and the entire flow is transparent and verifiable.
+Freelancers and clients in the Philippines and Southeast Asia who need a trustless way to handle project payments. Whether it's a web developer in Manila working for a startup in Singapore, or a graphic designer in Cebu contracted by a company in Lisbon—FreelanceChain removes the payment risk.
 
 ---
 
 ## Why Stellar
 
-Stellar offers sub-cent transaction fees (~$0.00001), 5-second finality, and native smart contract support via Soroban. Unlike Ethereum L2s or Solana, Stellar is purpose-built for financial transactions with built-in compliance tools. The escrow contract is composable and can be extended to support multi-milestone jobs, dispute resolution, and stablecoin (USDC) payments — all at a fraction of the cost of traditional payment rails.
+Stellar offers sub-cent transaction fees (~$0.00001), 5-second finality, and native smart contract support via Soroban. Unlike Ethereum L2s or Solana, Stellar is purpose-built for financial transactions and remittances. Soroban contracts are written in Rust, compiled to WebAssembly, and deployed on a stable, low-cost network.
 
 ---
 
