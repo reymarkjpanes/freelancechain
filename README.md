@@ -363,12 +363,16 @@ stellar contract invoke \
 
 ---
 
-## Security Notes
+## Security Notes & Architecture Defenses
 
-- `OPS_ACCOUNT_SECRET_KEY` lives only in `.env.local` (server-side). It is **never** exposed to the browser.
-- The Freighter wallet signs XDR locally — private keys never leave the user's device.
-- Never commit `.env.local` to git (it's in `.gitignore`).
-- Each contract function validates the caller's identity via `require_auth()`.
+This project implements multiple layers of security to protect both the platform and its users:
+
+- **Private Key Isolation:** `OPS_ACCOUNT_SECRET_KEY` lives only in `.env.local` (server-side). It is **never** exposed to the browser.
+- **Client-Side Signing:** The Freighter wallet signs XDR locally — private keys never leave the user's device.
+- **Strict Authorization (`require_auth`):** Every state-changing contract function validates the caller's identity via Soroban's `require_auth()`. This includes `create_job` (which ensures only the platform Ops admin can create jobs).
+- **Anti-Spoofing (Token Validation):** The frontend API (`/api/get-job`) strictly validates that the token address returned by the contract matches the expected XLM token address. If a hacker attempts to spoof a job with a worthless custom token, the API explicitly blocks it.
+- **Anti-Spam (Rate Limiting):** The `/api/create-job` endpoint includes an IP-based rate limiter (max 3 jobs per minute) to prevent Denial of Service (DoS) attacks from draining the Ops account's transaction fee XLM.
+- **No panics:** All smart contract functions return structured `Result<T, ContractError>` instead of panicking, preventing contract halts.
 
 ---
 
