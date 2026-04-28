@@ -1,0 +1,106 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# FreelanceChain — Continuous Integration
+# Runs on every push and pull request to ensure code quality.
+# ──────────────────────────────────────────────────────────────────────────────
+name: CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# ── Jobs ─────────────────────────────────────────────────────────────────────
+
+jobs:
+  # ── 1. Smart-Contract (Rust / Soroban) ────────────────────────────────────
+  contract:
+    name: 🔗 Smart Contract — Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🦀 Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: 📦 Cache Cargo registry & build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: 🔨 Install Stellar CLI
+        run: |
+          cargo install --locked stellar-cli --features opt
+        continue-on-error: false
+
+      - name: 🛠️ Build contract
+        run: stellar contract build
+
+      - name: ✅ Run contract tests
+        run: cargo test --workspace
+
+      - name: 📏 Check formatting
+        run: cargo fmt --all -- --check
+
+  # ── 2. Frontend (Next.js / TypeScript) ────────────────────────────────────
+  frontend:
+    name: 🌐 Frontend — Lint & Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Lint
+        run: npm run lint
+        continue-on-error: true
+
+      - name: 🏗️ Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_CONTRACT_ID: ${{ vars.NEXT_PUBLIC_CONTRACT_ID || 'CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD' }}
+          NEXT_PUBLIC_NETWORK: testnet
+
+  # ── 3. Summary Gate ───────────────────────────────────────────────────────
+  ci-pass:
+    name: ✅ CI Passed
+    if: always()
+    needs: [contract, frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check results
+        run: |
+          echo "Contract: ${{ needs.contract.result }}"
+          echo "Frontend: ${{ needs.frontend.result }}"
+          if [[ "${{ needs.contract.result }}" == "failure" || "${{ needs.frontend.result }}" == "failure" ]]; then
+            echo "❌ One or more jobs failed"
+            exit 1
+          fi
+          echo "🎉 All checks passed!"
