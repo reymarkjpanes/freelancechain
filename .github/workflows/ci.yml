@@ -51,8 +51,12 @@ jobs:
 
       - name: 🔨 Install Stellar CLI
         run: |
-          cargo install --locked stellar-cli
-        continue-on-error: false
+          if command -v stellar &>/dev/null; then
+            echo "✅ Stellar CLI found in cache: $(stellar --version)"
+          else
+            echo "📦 Installing Stellar CLI from crates.io…"
+            cargo install stellar-cli
+          fi
 
       - name: 🛠️ Build contract
         run: stellar contract build
