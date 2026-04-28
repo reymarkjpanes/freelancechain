@@ -129,7 +129,7 @@ impl FreelanceEscrow {
             .persistent()
             .get(&DataKey::Admin)
             .ok_or(ContractError::NotInitialized)?;
-        
+
         // Prevent unauthorized job creation and spoofing
         admin.require_auth();
 
