@@ -50,13 +50,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libdbus-1-dev pkg-config libudev-dev
 
       - name: 🔨 Install Stellar CLI
-        run: |
-          if command -v stellar &>/dev/null; then
-            echo "✅ Stellar CLI found in cache: $(stellar --version)"
-          else
-            echo "📦 Installing Stellar CLI from crates.io…"
-            cargo install stellar-cli --force
-          fi
+        run: cargo install --locked --force stellar-cli
 
       - name: 🛠️ Build contract
         run: stellar contract build
