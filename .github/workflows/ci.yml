@@ -55,7 +55,7 @@ jobs:
             echo "✅ Stellar CLI found in cache: $(stellar --version)"
           else
             echo "📦 Installing Stellar CLI from crates.io…"
-            cargo install stellar-cli
+            cargo install stellar-cli --force
           fi
 
       - name: 🛠️ Build contract
