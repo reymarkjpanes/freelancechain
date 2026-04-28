@@ -245,17 +245,6 @@ export default function EscrowFlow({
 
       {/* ── Progress Timeline ───────────────────── */}
       <div className="relative">
-        {/* Horizontal connector line (desktop) */}
-        <div className="hidden md:block absolute top-6 left-[40px] right-[40px] h-[2px] bg-white/[0.06] z-0" />
-        <div className="hidden md:block absolute top-6 left-[40px] h-[2px] bg-gradient-to-r from-violet-500 to-indigo-500 z-[1] transition-all duration-700"
-          style={{
-            width: jobState.status === "Completed" ? "100%" :
-                   jobState.status === "InProgress" ? "66%" :
-                   jobState.status === "Funded" ? "33%" : "0%",
-            maxWidth: "calc(100% - 80px)",
-          }}
-        />
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 relative z-10">
           {steps.map((step, i) => {
             const isActive = step.isCurrentStep;
