@@ -95,7 +95,7 @@ jobs:
       - name: 🏗️ Build
         run: npm run build
         env:
-          NEXT_PUBLIC_CONTRACT_ID: ${{ vars.NEXT_PUBLIC_CONTRACT_ID || 'CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD' }}
+          NEXT_PUBLIC_CONTRACT_ID: ${{ vars.NEXT_PUBLIC_CONTRACT_ID || 'CAR33UWAUPQPFDSKUJK6WAVS33SA2EEES3ZXZKB7GXSNOS7YUQ6LZISS' }}
           NEXT_PUBLIC_NETWORK: testnet
 
   # ── 3. Summary Gate ───────────────────────────────────────────────────────

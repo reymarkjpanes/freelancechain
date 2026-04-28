@@ -144,13 +144,13 @@ freelancechain/
 ### Contract ID (Deployed on Stellar Testnet)
 
 ```
-CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD
+CAR33UWAUPQPFDSKUJK6WAVS33SA2EEES3ZXZKB7GXSNOS7YUQ6LZISS
 ```
 
 | Explorer | Link |
 |---|---|
-| **Stellar Lab** | [View on Stellar Lab](https://lab.stellar.org/r/testnet/contract/CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD) |
-| **Stellar Expert** | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD) |
+| **Stellar Lab** | [View on Stellar Lab](https://lab.stellar.org/r/testnet/contract/CAR33UWAUPQPFDSKUJK6WAVS33SA2EEES3ZXZKB7GXSNOS7YUQ6LZISS) |
+| **Stellar Expert** | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CAR33UWAUPQPFDSKUJK6WAVS33SA2EEES3ZXZKB7GXSNOS7YUQ6LZISS) |
 
 #### Deployed Contract Screenshots
 
@@ -165,10 +165,10 @@ CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD
 ### Previously Deployed (Prototype)
 
 ```
-CBPXD4WLBHOQAX3YRI3Y55LE57ERDT57SLSBP32VFEQNL66PN7MAT26X
+CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD
 ```
 
-**Stellar Lab:** [View on Stellar Lab](https://lab.stellar.org/r/testnet/contract/CBPXD4WLBHOQAX3YRI3Y55LE57ERDT57SLSBP32VFEQNL66PN7MAT26X)
+**Stellar Lab:** [View on Stellar Lab](https://lab.stellar.org/r/testnet/contract/CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD)
 
 ### Contract Functions
 
