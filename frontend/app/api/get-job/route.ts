@@ -57,6 +57,18 @@ export async function GET(req: NextRequest) {
     console.log("[get-job] raw.status:", typeof raw.status, raw.status);
     console.log("[get-job] raw.milestone?.status:", typeof raw.milestone?.status, raw.milestone?.status);
 
+    const tokenAddress = raw.token_address?.toString();
+    const expectedTokenAddress = process.env.XLM_TOKEN_ADDRESS;
+
+    // Security Check: Ensure the job was created with the correct token (XLM)
+    if (tokenAddress !== expectedTokenAddress) {
+      console.error(`[get-job] SECURITY ALERT: Malicious token detected. Expected ${expectedTokenAddress}, got ${tokenAddress}`);
+      return NextResponse.json(
+        { error: "Error: This job uses an unrecognized or malicious token. It has been blocked for your safety." },
+        { status: 403 }
+      );
+    }
+
     // Map the contract's enum/struct return to a plain JSON shape
     const job = {
       job_id: raw.job_id,

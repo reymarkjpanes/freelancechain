@@ -34,8 +34,35 @@ async function rawGetTransaction(hash: string): Promise<{ status: string }> {
   return json.result ?? { status: "NOT_FOUND" };
 }
 
+// Simple in-memory rate limiter to prevent Ops account draining
+// Stores IP address and an array of request timestamps
+const rateLimitMap = new Map<string, number[]>();
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 3;
+
 export async function POST(req: NextRequest) {
   try {
+    // Basic IP Rate Limiting
+    const ip = req.headers.get("x-forwarded-for") ?? req.ip ?? "unknown";
+    const now = Date.now();
+    
+    if (ip !== "unknown") {
+      const timestamps = rateLimitMap.get(ip) ?? [];
+      // Filter out timestamps older than the window
+      const validTimestamps = timestamps.filter(t => now - t < RATE_LIMIT_WINDOW_MS);
+      
+      if (validTimestamps.length >= MAX_REQUESTS_PER_WINDOW) {
+        console.warn(`[create-job] Rate limit exceeded for IP: ${ip}`);
+        return NextResponse.json(
+          { error: "Too many requests. Please wait a minute before creating another job." },
+          { status: 429 }
+        );
+      }
+      
+      validTimestamps.push(now);
+      rateLimitMap.set(ip, validTimestamps);
+    }
+
     const { job_id, client_address, freelancer_address, amount_stroops } =
       await req.json();
 

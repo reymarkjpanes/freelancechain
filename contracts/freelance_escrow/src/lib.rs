@@ -123,10 +123,15 @@ impl FreelanceEscrow {
         total_amount: i128,
         token_address: Address,
     ) -> Result<(), ContractError> {
-        // Contract must be initialized
-        if !env.storage().persistent().has(&DataKey::Admin) {
-            return Err(ContractError::NotInitialized);
-        }
+        // Contract must be initialized and caller must be the admin (Ops account)
+        let admin: Address = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Admin)
+            .ok_or(ContractError::NotInitialized)?;
+        
+        // Prevent unauthorized job creation and spoofing
+        admin.require_auth();
 
         // Prevent duplicate job IDs
         if env
