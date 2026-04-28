@@ -43,7 +43,7 @@ const MAX_REQUESTS_PER_WINDOW = 3;
 export async function POST(req: NextRequest) {
   try {
     // Basic IP Rate Limiting
-    const ip = req.headers.get("x-forwarded-for") ?? req.ip ?? "unknown";
+    const ip = req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip") ?? "unknown";
     const now = Date.now();
     
     if (ip !== "unknown") {
