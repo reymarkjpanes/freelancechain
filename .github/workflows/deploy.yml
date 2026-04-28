@@ -23,7 +23,8 @@ jobs:
   deploy:
     name: 🚀 Deploy to Vercel
     runs-on: ubuntu-latest
-    # Only deploy after CI passes
+    # Skip if Vercel secrets are not configured
+    if: ${{ secrets.VERCEL_TOKEN != '' }}
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
