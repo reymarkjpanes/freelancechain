@@ -44,11 +44,11 @@ Automated CI/CD runs on every push and pull request via **GitHub Actions**:
 
 ## Problem
 
-A Filipino freelancer doing graphic design for an overseas client has no guarantee of payment after delivering work. The client either pays upfront and risks getting ghosted, or the freelancer works for free hoping they'll be paid. Neither party has leverage.
+A Filipino freelancer doing graphic design for an overseas client has no guarantee of payment after delivering work. The client either pays upfront and risks getting ghosted, or the freelancer works first and risks never receiving payment. Traditional payment methods (PayPal, bank transfers) charge high fees, take days to settle, and offer limited recourse in disputes. Escrow services exist but are centralized, opaque, and charge 5–10% in fees.
 
 ## Solution
 
-FreelanceChain locks XLM into a Soroban smart contract the moment a job is created. The freelancer submits work, the client approves — and payment releases automatically on-chain. No middleman, no delays, no trust required. Just cryptographic certainty.
+FreelanceChain locks XLM into a Soroban smart contract the moment a job is created. The freelancer submits work, the client approves — and payment releases automatically on-chain. No middleman, no delays, no disputes. Both parties see every transaction on the immutable ledger. The 2.5% platform fee is transparent, coded into the contract, and only charged on successful completion.
 
 ---
 
@@ -65,11 +65,11 @@ All confirmed transactions link to [Stellar Expert testnet explorer](https://ste
 
 ### ⚠️ Important Usage Notes
 
-- **Do not refresh the browser** during an active escrow flow. The app stores the current job session in memory — refreshing the page will clear it. If you accidentally refresh, use **Load Existing Job** with the saved Job ID to resume exactly where you left off.
+- **Do not refresh the browser** during an active escrow flow. The app stores the current job session in memory — refreshing the page will clear it. If you accidentally refresh, use **Load Existing Job** to pick up where you left off by entering the Job ID again.
 - **Testing both roles (Client & Freelancer):** Since each escrow step requires a different wallet, you have two options:
   1. **Two browsers** — Open the app in Chrome (Client wallet) and Firefox/Edge (Freelancer wallet) side by side. Both can load the same Job ID.
   2. **Single browser** — Disconnect the current wallet, switch to the other account in Freighter, reconnect, and use **Load Existing Job** to pick up the flow from the other party's perspective.
-- **After the other party acts**, use **Load Existing Job** with the same Job ID to see the updated on-chain status (e.g., after the client funds, the freelancer loads the job to see it's now "Funded").
+- **After the other party acts**, use **Load Existing Job** with the same Job ID to see the updated on-chain status (e.g., after the client funds, the freelancer loads the job to see it's now "Funded" and can submit work).
 
 ---
 
@@ -254,7 +254,7 @@ npm run dev
 
 **Requirements:** Node.js 20+ and the [Freighter wallet](https://www.freighter.app/) browser extension set to **Testnet**.
 
-> **Note:** `npm install --force` is needed because `@creit.tech/stellar-wallets-kit` has a peer dependency on React 18, but this project uses React 19. The `--force` flag bypasses this — everything works fine.
+> **Note:** `npm install --force` is needed because `@creit.tech/stellar-wallets-kit` has a peer dependency on React 18, but this project uses React 19. The `--force` flag bypasses this — everything works correctly despite the version mismatch in peer dependencies.
 
 ---
 
@@ -369,22 +369,22 @@ This project implements multiple layers of security to protect both the platform
 
 - **Private Key Isolation:** `OPS_ACCOUNT_SECRET_KEY` lives only in `.env.local` (server-side). It is **never** exposed to the browser.
 - **Client-Side Signing:** The Freighter wallet signs XDR locally — private keys never leave the user's device.
-- **Strict Authorization (`require_auth`):** Every state-changing contract function validates the caller's identity via Soroban's `require_auth()`. This includes `create_job` (which ensures only the platform Ops admin can create jobs).
-- **Anti-Spoofing (Token Validation):** The frontend API (`/api/get-job`) strictly validates that the token address returned by the contract matches the expected XLM token address. If a hacker attempts to spoof a job with a worthless custom token, the API explicitly blocks it.
-- **Anti-Spam (Rate Limiting):** The `/api/create-job` endpoint includes an IP-based rate limiter (max 3 jobs per minute) to prevent Denial of Service (DoS) attacks from draining the Ops account's transaction fee XLM.
+- **Strict Authorization (`require_auth`):** Every state-changing contract function validates the caller's identity via Soroban's `require_auth()`. This includes `create_job` (which ensures only the platform's ops account can register jobs) and all user-initiated actions.
+- **Anti-Spoofing (Token Validation):** The frontend API (`/api/get-job`) strictly validates that the token address returned by the contract matches the expected XLM token address. If a hacker attempts to replace the contract, mismatched tokens are rejected immediately.
+- **Anti-Spam (Rate Limiting):** The `/api/create-job` endpoint includes an IP-based rate limiter (max 3 jobs per minute) to prevent Denial of Service (DoS) attacks from draining the Ops account's transaction quota and XLM balance.
 - **No panics:** All smart contract functions return structured `Result<T, ContractError>` instead of panicking, preventing contract halts.
 
 ---
 
 ## Target Users
 
-Freelancers and clients in the Philippines and Southeast Asia who need a trustless way to handle project payments. Whether it's a web developer in Manila working for a startup in Singapore, or a graphic designer in Cebu contracted by a company in Lisbon—FreelanceChain removes the payment risk.
+Freelancers and clients in the Philippines and Southeast Asia who need a trustless way to handle project payments. Whether it's a web developer in Manila working for a startup in Singapore, or a graphic designer in Cebu serving clients in Europe, FreelanceChain eliminates payment risk. The platform is built for teams that lack access to traditional banking infrastructure or who want to avoid the fees and delays of centralized payment processors.
 
 ---
 
 ## Why Stellar
 
-Stellar offers sub-cent transaction fees (~$0.00001), 5-second finality, and native smart contract support via Soroban. Unlike Ethereum L2s or Solana, Stellar is purpose-built for financial transactions and remittances. Soroban contracts are written in Rust, compiled to WebAssembly, and deployed on a stable, low-cost network.
+Stellar offers sub-cent transaction fees (~$0.00001), 5-second finality, and native smart contract support via Soroban. Unlike Ethereum L2s or Solana, Stellar is purpose-built for financial transactions and remittances. Its anchor ecosystem and SEP standards make it ideal for bridging traditional and blockchain finance. For Southeast Asian freelancers sending and receiving payments across borders, Stellar's efficiency and low cost are transformative.
 
 ---
 
