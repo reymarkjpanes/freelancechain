@@ -90,8 +90,7 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: 🔍 Lint
-        run: npm run lint
-        continue-on-error: true
+        run: npm run lint || echo "⚠️ Lint warnings found (non-blocking)"
 
       - name: 🏗️ Build
         run: npm run build
