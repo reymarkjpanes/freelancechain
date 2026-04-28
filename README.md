@@ -337,7 +337,7 @@ npm run dev
 ```bash
 # Create a test job (10 XLM = 100,000,000 stroops)
 stellar contract invoke \
-  --id CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD \
+  --id CAR33UWAUPQPFDSKUJK6WAVS33SA2EEES3ZXZKB7GXSNOS7YUQ6LZISS \
   --source ops \
   --network testnet \
   -- create_job \
@@ -349,14 +349,14 @@ stellar contract invoke \
 
 # Read job state
 stellar contract invoke \
-  --id CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD \
+  --id CAR33UWAUPQPFDSKUJK6WAVS33SA2EEES3ZXZKB7GXSNOS7YUQ6LZISS \
   --network testnet \
   -- get_job \
   --job_id "demo_001"
 
 # Check platform fee
 stellar contract invoke \
-  --id CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD \
+  --id CAR33UWAUPQPFDSKUJK6WAVS33SA2EEES3ZXZKB7GXSNOS7YUQ6LZISS \
   --network testnet \
   -- get_fee
 ```
@@ -408,7 +408,7 @@ Stellar offers sub-cent transaction fees (~$0.00001), 5-second finality, and nat
 | Live demo link | ✅ [frontend-nu-pearl-3s0nq0wsv5.vercel.app](https://frontend-nu-pearl-3s0nq0wsv5.vercel.app) |
 | Screenshot: mobile responsive view | ✅ [See above](#mobile-responsive-design) |
 | Screenshot/badge: CI/CD pipeline | ✅ [See above](#cicd-pipeline) |
-| Contract address | ✅ `CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD` |
+| Contract address | ✅ `CAR33UWAUPQPFDSKUJK6WAVS33SA2EEES3ZXZKB7GXSNOS7YUQ6LZISS` |
 | CI/CD running | ✅ GitHub Actions — CI + Deploy workflows |
 | Mobile responsive | ✅ Tailwind responsive classes + tested on 375px viewport |
 | Production-ready | ✅ Deployed on Vercel with Soroban testnet integration |
