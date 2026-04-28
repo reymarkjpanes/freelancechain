@@ -1,5 +1,8 @@
 # FreelanceChain
 
+[![CI](https://github.com/reymarkjpanes/freelancechain/actions/workflows/ci.yml/badge.svg)](https://github.com/reymarkjpanes/freelancechain/actions/workflows/ci.yml)
+[![Deploy](https://github.com/reymarkjpanes/freelancechain/actions/workflows/deploy.yml/badge.svg)](https://github.com/reymarkjpanes/freelancechain/actions/workflows/deploy.yml)
+
 Peer-to-peer freelance escrow payments on Stellar, built with Soroban smart contracts.
 
 > 🚀 **Live App:** [https://frontend-nu-pearl-3s0nq0wsv5.vercel.app](https://frontend-nu-pearl-3s0nq0wsv5.vercel.app)
@@ -11,6 +14,31 @@ Peer-to-peer freelance escrow payments on Stellar, built with Soroban smart cont
 ![FreelanceChain — Dark glassmorphism UI with escrow workflow](images/app-ui-preview.png)
 
 *Landing page showing the Connect Wallet, Create Job, and Load Existing Job sections on the Stellar Testnet.*
+
+---
+
+## Mobile Responsive Design
+
+The UI is fully responsive and adapts gracefully to mobile viewports:
+
+![FreelanceChain — Mobile responsive view on iPhone](images/mobile-responsive-view.png)
+
+*Mobile view (375×812) — cards stack vertically, typography scales, and all interactive elements remain accessible on small screens.*
+
+---
+
+## CI/CD Pipeline
+
+Automated CI/CD runs on every push and pull request via **GitHub Actions**:
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| **CI** (`ci.yml`) | Push / PR to `main`, `master`, `develop` | Builds Soroban contract, runs tests, checks formatting, lints + builds Next.js frontend |
+| **Deploy** (`deploy.yml`) | Push to `main` (frontend changes) | Deploys frontend to Vercel (requires `VERCEL_TOKEN` secret) |
+
+![CI/CD pipeline — GitHub Actions passing](images/ci-cd-pipeline.png)
+
+*GitHub Actions dashboard showing the CI pipeline passing (green ✅) after iterative fixes.*
 
 ---
 
@@ -363,6 +391,23 @@ Stellar offers sub-cent transaction fees (~$0.00001), 5-second finality, and nat
 - [@stellar/stellar-sdk](https://github.com/stellar/js-stellar-sdk) — Transaction building and RPC
 - [@creit.tech/stellar-wallets-kit](https://github.com/Creit-Tech/Stellar-Wallets-Kit) — Freighter wallet integration
 - [Tailwind CSS](https://tailwindcss.com/) — Styling
+
+---
+
+## Submission Checklist (Stellar Journey to Mastery)
+
+| Requirement | Status |
+|---|---|
+| Public GitHub repository | ✅ [reymarkjpanes/freelancechain](https://github.com/reymarkjpanes/freelancechain) |
+| README with complete documentation | ✅ This file |
+| Minimum 8+ meaningful commits | ✅ 26 commits |
+| Live demo link | ✅ [frontend-nu-pearl-3s0nq0wsv5.vercel.app](https://frontend-nu-pearl-3s0nq0wsv5.vercel.app) |
+| Screenshot: mobile responsive view | ✅ [See above](#mobile-responsive-design) |
+| Screenshot/badge: CI/CD pipeline | ✅ [See above](#cicd-pipeline) |
+| Contract address | ✅ `CB6EX6RFBNMGUZUHZOY5KA5I4PKMK4OLV4ICVDJ4SZP4GMHS44B4RBJD` |
+| CI/CD running | ✅ GitHub Actions — CI + Deploy workflows |
+| Mobile responsive | ✅ Tailwind responsive classes + tested on 375px viewport |
+| Production-ready | ✅ Deployed on Vercel with Soroban testnet integration |
 
 ---
 
