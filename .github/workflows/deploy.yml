@@ -11,11 +11,9 @@
 name: Deploy
 
 on:
-  workflow_dispatch:       # Manual trigger only — run from the Actions tab
+  workflow_dispatch:       # Manual trigger — run from the Actions tab
   push:
     branches: [main, master]
-    paths:
-      - 'frontend/**'     # Only deploy when frontend code changes
 
 concurrency:
   group: deploy-${{ github.ref }}
@@ -52,6 +50,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: check-secrets
     if: needs.check-secrets.outputs.has-secrets == 'true'
+    environment:
+      name: Production
+      url: ${{ steps.deploy.outputs.url }}
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
@@ -80,3 +81,4 @@ jobs:
           echo "### 🚀 Deployment URL" >> $GITHUB_STEP_SUMMARY
           echo "[$URL]($URL)" >> $GITHUB_STEP_SUMMARY
         working-directory: frontend
+
