@@ -1,8 +1,7 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype,
-    symbol_short, token, Address, Env, String,
+    contract, contracterror, contractimpl, contracttype, symbol_short, token, Address, Env, String,
 };
 
 // ─── Storage Keys ────────────────────────────────────────────────────────────
@@ -62,14 +61,14 @@ pub struct JobRecord {
 #[contracterror]
 #[derive(Clone, Debug, PartialEq)]
 pub enum ContractError {
-    AlreadyInitialized     = 1,
-    NotInitialized         = 2,
-    JobAlreadyExists       = 3,
-    JobNotFound            = 4,
-    MilestoneNotFound      = 5,
-    Unauthorized           = 6,
-    InvalidAmount          = 7,
-    InvalidJobStatus       = 8,
+    AlreadyInitialized = 1,
+    NotInitialized = 2,
+    JobAlreadyExists = 3,
+    JobNotFound = 4,
+    MilestoneNotFound = 5,
+    Unauthorized = 6,
+    InvalidAmount = 7,
+    InvalidJobStatus = 8,
     InvalidMilestoneStatus = 9,
 }
 
@@ -80,7 +79,6 @@ pub struct FreelanceEscrow;
 
 #[contractimpl]
 impl FreelanceEscrow {
-
     // ── Initialize ────────────────────────────────────────────────────────────
 
     /// One-time setup. Must be called by the ops/platform account.
@@ -94,17 +92,16 @@ impl FreelanceEscrow {
         }
         admin.require_auth();
         env.storage().persistent().set(&DataKey::Admin, &admin);
-        env.storage().persistent().set(&DataKey::Fee, &fee_basis_points);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Fee, &fee_basis_points);
         Ok(())
     }
 
     // ── Admin: update platform fee ────────────────────────────────────────────
 
     /// Update global fee rate. Does NOT affect in-flight jobs.
-    pub fn update_platform_fee(
-        env: Env,
-        new_fee: u32,
-    ) -> Result<(), ContractError> {
+    pub fn update_platform_fee(env: Env, new_fee: u32) -> Result<(), ContractError> {
         let admin: Address = env
             .storage()
             .persistent()
@@ -132,16 +129,16 @@ impl FreelanceEscrow {
         }
 
         // Prevent duplicate job IDs
-        if env.storage().persistent().has(&DataKey::Job(job_id.clone())) {
+        if env
+            .storage()
+            .persistent()
+            .has(&DataKey::Job(job_id.clone()))
+        {
             return Err(ContractError::JobAlreadyExists);
         }
 
         // Snapshot fee at creation time — immutable for this job's lifetime
-        let fee_snapshot: u32 = env
-            .storage()
-            .persistent()
-            .get(&DataKey::Fee)
-            .unwrap_or(0);
+        let fee_snapshot: u32 = env.storage().persistent().get(&DataKey::Fee).unwrap_or(0);
 
         let milestone = MilestoneRecord {
             milestone_id: String::from_str(&env, "ms_001"),
@@ -161,7 +158,9 @@ impl FreelanceEscrow {
             milestone,
         };
 
-        env.storage().persistent().set(&DataKey::Job(job_id.clone()), &job);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Job(job_id.clone()), &job);
 
         // Emit event
         env.events().publish(
@@ -202,20 +201,16 @@ impl FreelanceEscrow {
 
         // SEP-41 token transfer: client → contract
         let token_client = token::Client::new(&env, &job.token_address);
-        token_client.transfer(
-            &caller,
-            &env.current_contract_address(),
-            &amount,
-        );
+        token_client.transfer(&caller, &env.current_contract_address(), &amount);
 
         job.funded_amount = amount;
         job.status = JobStatus::Funded;
-        env.storage().persistent().set(&DataKey::Job(job_id.clone()), &job);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Job(job_id.clone()), &job);
 
-        env.events().publish(
-            (symbol_short!("fund"), job_id),
-            (amount, caller),
-        );
+        env.events()
+            .publish((symbol_short!("fund"), job_id), (amount, caller));
 
         Ok(())
     }
@@ -252,12 +247,12 @@ impl FreelanceEscrow {
 
         job.milestone.status = MilestoneStatus::Submitted;
         job.status = JobStatus::InProgress;
-        env.storage().persistent().set(&DataKey::Job(job_id.clone()), &job);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Job(job_id.clone()), &job);
 
-        env.events().publish(
-            (symbol_short!("submit"), job_id, milestone_id),
-            (caller,),
-        );
+        env.events()
+            .publish((symbol_short!("submit"), job_id, milestone_id), (caller,));
 
         Ok(())
     }
@@ -304,24 +299,18 @@ impl FreelanceEscrow {
         let token_client = token::Client::new(&env, &job.token_address);
 
         // Transfer net amount to freelancer
-        token_client.transfer(
-            &env.current_contract_address(),
-            &job.freelancer,
-            &net,
-        );
+        token_client.transfer(&env.current_contract_address(), &job.freelancer, &net);
 
         // Transfer platform fee to admin
         if fee > 0 {
-            token_client.transfer(
-                &env.current_contract_address(),
-                &admin,
-                &fee,
-            );
+            token_client.transfer(&env.current_contract_address(), &admin, &fee);
         }
 
         job.milestone.status = MilestoneStatus::Approved;
         job.status = JobStatus::Completed;
-        env.storage().persistent().set(&DataKey::Job(job_id.clone()), &job);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Job(job_id.clone()), &job);
 
         env.events().publish(
             (symbol_short!("approve"), job_id, milestone_id),
@@ -333,10 +322,7 @@ impl FreelanceEscrow {
 
     // ── Read-only ─────────────────────────────────────────────────────────────
 
-    pub fn get_job(
-        env: Env,
-        job_id: String,
-    ) -> Result<JobRecord, ContractError> {
+    pub fn get_job(env: Env, job_id: String) -> Result<JobRecord, ContractError> {
         env.storage()
             .persistent()
             .get(&DataKey::Job(job_id))
@@ -344,10 +330,7 @@ impl FreelanceEscrow {
     }
 
     pub fn get_fee(env: Env) -> u32 {
-        env.storage()
-            .persistent()
-            .get(&DataKey::Fee)
-            .unwrap_or(0)
+        env.storage().persistent().get(&DataKey::Fee).unwrap_or(0)
     }
 
     pub fn get_admin(env: Env) -> Result<Address, ContractError> {

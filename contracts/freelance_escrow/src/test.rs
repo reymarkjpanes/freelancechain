@@ -1,10 +1,7 @@
 #![cfg(test)]
 
 use super::*;
-use soroban_sdk::{
-    testutils::Address as _,
-    token, Address, Env, String,
-};
+use soroban_sdk::{testutils::Address as _, token, Address, Env, String};
 
 // ─── Test Helpers ─────────────────────────────────────────────────────────────
 
@@ -27,7 +24,9 @@ impl TestCtx {
         let contract_id = env.register(FreelanceEscrow, ());
 
         let token_admin = Address::generate(&env);
-        let token_id = env.register_stellar_asset_contract_v2(token_admin.clone()).address();
+        let token_id = env
+            .register_stellar_asset_contract_v2(token_admin.clone())
+            .address();
 
         let admin = Address::generate(&env);
         let client = Address::generate(&env);
@@ -43,7 +42,16 @@ impl TestCtx {
         let job_id = String::from_str(&env, "job_001");
         let milestone_id = String::from_str(&env, "ms_001");
 
-        TestCtx { env, contract_id, admin, client, freelancer, token_id, job_id, milestone_id }
+        TestCtx {
+            env,
+            contract_id,
+            admin,
+            client,
+            freelancer,
+            token_id,
+            job_id,
+            milestone_id,
+        }
     }
 
     fn api(&self) -> FreelanceEscrowClient {
@@ -117,7 +125,8 @@ fn test_fund_job_success() {
     let ctx = TestCtx::new();
     ctx.create_default_job();
 
-    ctx.api().fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
+    ctx.api()
+        .fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
 
     let job = ctx.api().get_job(&ctx.job_id);
     assert_eq!(job.status, JobStatus::Funded);
@@ -150,9 +159,11 @@ fn test_fund_job_wrong_amount_fails() {
 fn test_fund_job_wrong_status_fails() {
     let ctx = TestCtx::new();
     ctx.create_default_job();
-    ctx.api().fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
+    ctx.api()
+        .fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
     // Try to fund again — should panic with InvalidJobStatus
-    ctx.api().fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
+    ctx.api()
+        .fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
 }
 
 // ─── Submit Milestone ─────────────────────────────────────────────────────────
@@ -161,8 +172,10 @@ fn test_fund_job_wrong_status_fails() {
 fn test_submit_milestone_success() {
     let ctx = TestCtx::new();
     ctx.create_default_job();
-    ctx.api().fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
-    ctx.api().submit_milestone(&ctx.job_id, &ctx.milestone_id, &ctx.freelancer);
+    ctx.api()
+        .fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
+    ctx.api()
+        .submit_milestone(&ctx.job_id, &ctx.milestone_id, &ctx.freelancer);
 
     let job = ctx.api().get_job(&ctx.job_id);
     assert_eq!(job.status, JobStatus::InProgress);
@@ -174,9 +187,11 @@ fn test_submit_milestone_success() {
 fn test_submit_milestone_wrong_caller_fails() {
     let ctx = TestCtx::new();
     ctx.create_default_job();
-    ctx.api().fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
+    ctx.api()
+        .fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
     let stranger = Address::generate(&ctx.env);
-    ctx.api().submit_milestone(&ctx.job_id, &ctx.milestone_id, &stranger);
+    ctx.api()
+        .submit_milestone(&ctx.job_id, &ctx.milestone_id, &stranger);
 }
 
 // ─── Approve Milestone ────────────────────────────────────────────────────────
@@ -185,10 +200,13 @@ fn test_submit_milestone_wrong_caller_fails() {
 fn test_approve_milestone_success_and_fee_calculation() {
     let ctx = TestCtx::new();
     ctx.create_default_job();
-    ctx.api().fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
-    ctx.api().submit_milestone(&ctx.job_id, &ctx.milestone_id, &ctx.freelancer);
+    ctx.api()
+        .fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
+    ctx.api()
+        .submit_milestone(&ctx.job_id, &ctx.milestone_id, &ctx.freelancer);
 
-    let (net, fee) = ctx.api()
+    let (net, fee) = ctx
+        .api()
         .approve_milestone(&ctx.job_id, &ctx.milestone_id, &ctx.client);
 
     // 250 bps on 10_000_000 = 250_000 fee, 9_750_000 net
@@ -212,10 +230,13 @@ fn test_approve_milestone_success_and_fee_calculation() {
 fn test_approve_milestone_wrong_caller_fails() {
     let ctx = TestCtx::new();
     ctx.create_default_job();
-    ctx.api().fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
-    ctx.api().submit_milestone(&ctx.job_id, &ctx.milestone_id, &ctx.freelancer);
+    ctx.api()
+        .fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
+    ctx.api()
+        .submit_milestone(&ctx.job_id, &ctx.milestone_id, &ctx.freelancer);
     let stranger = Address::generate(&ctx.env);
-    ctx.api().approve_milestone(&ctx.job_id, &ctx.milestone_id, &stranger);
+    ctx.api()
+        .approve_milestone(&ctx.job_id, &ctx.milestone_id, &stranger);
 }
 
 #[test]
@@ -223,9 +244,11 @@ fn test_approve_milestone_wrong_caller_fails() {
 fn test_approve_milestone_not_submitted_fails() {
     let ctx = TestCtx::new();
     ctx.create_default_job();
-    ctx.api().fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
+    ctx.api()
+        .fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
     // Skip submit — should panic with InvalidMilestoneStatus
-    ctx.api().approve_milestone(&ctx.job_id, &ctx.milestone_id, &ctx.client);
+    ctx.api()
+        .approve_milestone(&ctx.job_id, &ctx.milestone_id, &ctx.client);
 }
 
 // ─── Happy Path End-to-End ────────────────────────────────────────────────────
@@ -234,9 +257,12 @@ fn test_approve_milestone_not_submitted_fails() {
 fn test_full_happy_path() {
     let ctx = TestCtx::new();
     ctx.create_default_job();
-    ctx.api().fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
-    ctx.api().submit_milestone(&ctx.job_id, &ctx.milestone_id, &ctx.freelancer);
-    let (net, fee) = ctx.api()
+    ctx.api()
+        .fund_job(&ctx.job_id, &ctx.client, &10_000_000i128);
+    ctx.api()
+        .submit_milestone(&ctx.job_id, &ctx.milestone_id, &ctx.freelancer);
+    let (net, fee) = ctx
+        .api()
         .approve_milestone(&ctx.job_id, &ctx.milestone_id, &ctx.client);
 
     assert_eq!(net + fee, 10_000_000, "Conservation of funds violated");
