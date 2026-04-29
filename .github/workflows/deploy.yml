@@ -70,15 +70,18 @@ jobs:
         run: npm install -g vercel@latest
 
       - name: 🔧 Pull Vercel environment
+        shell: bash
         run: vercel pull --yes --environment=${{ github.event_name == 'push' && 'production' || 'preview' }} --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: frontend
 
       - name: 🏗️ Build with Vercel
+        shell: bash
         run: vercel build ${{ github.event_name == 'push' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: frontend
 
       - name: 🚀 Deploy to Vercel
         id: deploy
+        shell: bash
         run: |
           URL=$(vercel deploy --prebuilt ${{ github.event_name == 'push' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }})
           echo "url=$URL" >> $GITHUB_OUTPUT
