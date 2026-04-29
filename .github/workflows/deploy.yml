@@ -71,11 +71,9 @@ jobs:
 
       - name: 🔧 Pull Vercel environment
         run: vercel pull --yes --environment=${{ github.event_name == 'push' && 'production' || 'preview' }} --token=${{ secrets.VERCEL_TOKEN }}
-        working-directory: frontend
 
       - name: 🏗️ Build with Vercel
         run: vercel build ${{ github.event_name == 'push' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
-        working-directory: frontend
 
       - name: 🚀 Deploy to Vercel
         id: deploy
@@ -84,5 +82,4 @@ jobs:
           echo "url=$URL" >> $GITHUB_OUTPUT
           echo "### 🚀 Deployment URL" >> $GITHUB_STEP_SUMMARY
           echo "[$URL]($URL)" >> $GITHUB_STEP_SUMMARY
-        working-directory: frontend
 
